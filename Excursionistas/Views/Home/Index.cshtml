@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "Calcular";
+}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    #formulario {
+        margin-bottom: 20px;
+    }
+
+    #resultado {
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+
+<div id="formulario">
+    <label for="minCalorias">Mínimo de calorías:</label>
+    <input type="number" id="minCalorias" name="minCalorias" value="0">
+
+    <label for="pesoMaximo">Peso máximo:</label>
+    <input type="number" id="pesoMaximo" name="pesoMaximo" value="0">
+
+    <button onclick="Calcular()">Calcular</button>
+</div>
+
+<div id="resultado">
+    <!-- Aquí se mostrarán los resultados después de hacer clic en el botón de Calcular -->
+</div>
+
+<script>
+
+    function Calcular() {
+        var minCalorias = document.getElementById("minCalorias").value;
+        var pesoMaximo = document.getElementById("pesoMaximo").value;
+
+        // Construir la URL de la solicitud fetch con los parámetros
+        var url = `@Url.Action("GetCalcular", "Calcular")?calorias=${minCalorias}&peso=${pesoMaximo}`;
+
+        fetch(url).then(response => response.json()).then(data => {
+            var jdata = JSON.parse(data);
+            var resultadoHTML = "<p>Valor máximo de calorías: " + jdata["MaxCalorias"] + "</p>";
+            resultadoHTML += "<p>Valor mínimo de peso: " + jdata["MinPeso"] + "</p>";
+
+            // Construir la tabla HTML con los datos de elementos
+            var tabla = "<table border='1'><tr><th>Name</th><th>Peso</th><th>Calorias</th></tr>";
+            jdata["Elementos"].forEach(elemento => {
+                tabla += "<tr><td>" + elemento.Name + "</td><td>" + elemento.Peso + "</td><td>" + elemento.Calorias + "</td></tr>";
+            });
+            tabla += "</table>";
+
+            // Agregar la tabla al resultado HTML
+            resultadoHTML += tabla;
+
+
+            document.getElementById("resultado").innerHTML = resultadoHTML;
+
+            alert(jdata["Mensaje"]);
+        }).catch(error => {
+            console.error('Error al obtener el resultado:', error);
+        });
+    
+        
+        
+    }
+</script>
